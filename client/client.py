@@ -1,4 +1,6 @@
 import paho.mqtt.client as mqtt
+import datetime # for get date and time function
+import time # for sleep function
 import os
 from urllib import parse as urlparse
 
@@ -51,6 +53,13 @@ mqttc.subscribe(topic, 0)
 mqttc.publish(topic, "my message")
 
 # Continue the network loop, exit when an error occurs
+
+while True:
+    dummyData = str(datetime.datetime.now())
+    mqttc.publish(topic, dummyData)
+    print(dummyData)
+    time.sleep(1)
+
 run = True
 while run:
     mqttc.loop()
