@@ -18,6 +18,14 @@ var options = {
     clean: false,
     encoding: 'utf8'
 };
+
+var sensorServerData= {"Payload":{}};
+
+app.use(express.static(__dirname + '/public'));
+//app.use('/scripts', express.static('./node_modules/'));
+// register new sensor server to handle request from client
+var sensorServerCallback = require('./routes/sensorServer');
+
 var client = mqtt.connect('mqtt://m13.cloudmqtt.com', options);
 client.on('connect', function() { // When connected
     console.log('connected');
@@ -26,6 +34,7 @@ client.on('connect', function() { // When connected
         // when a message arrives, do something with it
         client.on('message', function(topic, message, packet) {
             console.log("Received '" + message + "' on '" + topic + "'");
+            sensorServerData.Payload = message;
         });
     });
 
@@ -39,8 +48,14 @@ client.on('connect', function() { // When connected
 client.on('error', function(err) { // When connected
     console.log(err);
 });
+
+
+
+// API sessor data: return sensor data to client view
+app.get('/sensorData', sensorServerCallback.returnCurrentSensorData(sensorServerData));
+
 app.get('/', function(req, res) {
-	res.send('Hello')
+	res.send('available APIs are:')
 });
 
 app.listen(3000);
